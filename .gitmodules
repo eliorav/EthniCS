@@ -1,3 +1,6 @@
 [submodule "data_preparation/iAdmix"]
 	path = data_preparation/iAdmix
 	url = https://github.com/eliorav/iAdmix
+[submodule "Population-Genotype-Frequency"]
+	path = population_genotype_frequency
+	url = https://github.com/eliorav/Population-Genotype-Frequency.git

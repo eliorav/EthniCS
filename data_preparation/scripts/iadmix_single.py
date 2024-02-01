@@ -41,7 +41,6 @@ if __name__ == '__main__':
     )
     parser.add_argument(
         "--sample_idx",
-        default=1,
         type=int,
         help="The index of the current pool",
     )

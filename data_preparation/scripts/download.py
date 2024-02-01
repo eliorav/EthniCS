@@ -9,9 +9,7 @@ import os
 import shutil
 import urllib.request as request
 from contextlib import closing
-
-
-from config import DOWNLOAD_FOLDER, LIST_PATH, FTP_PROXY
+from config import DOWNLOAD_FOLDER, LIST_PATH, FTP_PROXY, DATA_FTP_SERVER
 
 def load_json(path):
     """
@@ -122,7 +120,7 @@ def download_sample_ftp(args):
         out_folder.mkdir(exist_ok=True, parents=True)   
 
         for ftp_path in [sample_info['bai'], sample_info['bam']]:
-            req = request.Request(f'ftp://ftp.1000genomes.ebi.ac.uk/{ftp_path}')
+            req = request.Request(f'{DATA_FTP_SERVER}/{ftp_path}')
             req.set_proxy(args.ftp_proxy, 'http')
 
             with closing(request.urlopen(req)) as r:
