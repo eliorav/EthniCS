@@ -8,6 +8,18 @@ from ...configs.generate_simulation_config import number_of_pools_range
 
 
 def get_df_stats(x, y, solvers_data, num_of_pools):
+    """
+    Calculate statistics for each solver and EthniCS.
+
+    Args:
+        x (numpy.ndarray): The original signal matrix.
+        y (numpy.ndarray): The sensed signal matrix.
+        solvers_data (dict): A dictionary containing solver data for each ethnicity.
+        num_of_pools (int): The number of pools used in the experiment.
+
+    Returns:
+        pandas.DataFrame: A DataFrame containing the statistics for each solver and EthniCS.
+    """
     sol_stats = []
     for ethnicity_num, solvers in solvers_data.items():
         for sol_name, sol_data in solvers.items():
@@ -37,6 +49,12 @@ def get_df_stats(x, y, solvers_data, num_of_pools):
 
 
 def get_solvers_stats(experiments_folder):
+    """
+    Calculate statistics for solvers using different experiment configurations.
+
+    Args:
+        experiments_folder (str): The path to the folder containing the experiment data.
+    """
     df_stats = pd.DataFrame()
     for m in tqdm(number_of_pools_range):
         for exp in experiments_folder.glob(f"**/{x_ethnics_filename}_{m}*"):

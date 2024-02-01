@@ -7,10 +7,27 @@ from ..compressed_sensing_tools.sensing_matrix import generate_bernoulli_matrix
 from .generate_ethnicity_matrix import generate_ethnicity_matrix
 
 def load_ethnicity_distribution(ethnicity_distribution_path):
+    """
+    Load the ethnicity distribution from a pickle file.
+
+    Args:
+        ethnicity_distribution_path (str): Path to the pickle file containing the ethnicity distribution.
+
+    Returns:
+        dict: The loaded ethnicity distribution.
+    """
     with open(ethnicity_distribution_path, "rb") as f_in:
         return pickle.load(f_in)
 
 def generate_simulations(args, config, output_folder):
+    """
+    Generate simulations for the experiments.
+
+    Args:
+        args (argparse.Namespace): Command-line arguments.
+        config (Config): Configuration object.
+        output_folder (Path): Path to the output folder.
+    """
     ethnicity_distribution = load_ethnicity_distribution(args.ethnicity_distribution_path)
     n = args.number_of_individuals
 

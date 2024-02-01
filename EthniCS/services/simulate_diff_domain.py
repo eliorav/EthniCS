@@ -9,7 +9,15 @@ from ..compressed_sensing_tools.metrics import Metric
 
 def generate_random_vector(n, max_k, domain: BaseTransformer):
     """
-    Generate a random vecor of size n for a given domain
+    Generate a random vector of size n for a given domain.
+
+    Args:
+        n (int): The size of the vector.
+        max_k (int): The maximum number of non-zero elements in the vector.
+        domain (BaseTransformer): The domain to generate the vector for.
+
+    Returns:
+        tuple: A tuple containing the generated vector, its transformed representation, and the number of non-zero elements.
     """
     a = np.zeros(n)
     k = np.random.choice(range(1, max_k + 1))
@@ -17,8 +25,6 @@ def generate_random_vector(n, max_k, domain: BaseTransformer):
     x = domain.inverse_transform_vector(a)
     x[x < 0] = 0
     return x, domain.transform_vector(x), k
-
-
 
 def simulate_diff_domain(
     domain: BaseTransformer,
@@ -31,16 +37,22 @@ def simulate_diff_domain(
     should_search_params=False,
 ):
     """
-    Simulate CS problem for a vector from a particular domain
-    param domain: the domain we want to test
-    param transformers: a list of transformation to check
-    param solvers: a list of solver to use
-    n: the size of the vector
-    m: the number of measurements
-    metrics: a list of metrics to collect
-    max_k: maximum number of non zero elements in the vector
-    should_search_params: if you use hyperparameters optimization for the solvers
+    Simulate a compressed sensing problem from a particular domain.
+
+    Args:
+        domain (BaseTransformer): The domain to test.
+        transformers (List[BaseTransformer]): A list of transformations to check.
+        solvers (List[CsSolver]): A list of solvers to use.
+        n (int): The size of the vector.
+        m (int): The number of measurements.
+        metrics (Optional[List[Metric]], optional): A list of metrics to collect. Defaults to [].
+        max_k (int, optional): The maximum number of non-zero elements in the vector. Defaults to 5.
+        should_search_params (bool, optional): Whether to use hyperparameter optimization for the solvers. Defaults to False.
+
+    Returns:
+        tuple: A tuple containing the data for the original and reconstructed vectors, the metrics results, and the sensing matrix.
     """
+
     phi = generate_bernoulli_matrix(n, m)
     x, a, k = generate_random_vector(n, max_k, domain)
     y = get_sensing_vector(phi, x)

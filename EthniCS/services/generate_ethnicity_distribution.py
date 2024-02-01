@@ -3,6 +3,13 @@ import numpy as np
 from pathlib import Path
 
 def generate_ethnicity_distribution(ethnicities_df, out_folder):
+    """
+    Generate ethnicity distribution based on the given ethnicities dataframe.
+
+    Parameters:
+    - ethnicities_df (pandas.DataFrame): DataFrame containing ethnicity data.
+    - out_folder (str): Path to the output folder.
+    """
     ethnicity_distribution = {}
 
     for ethnicity_num in range(ethnicities_df.shape[1]):
