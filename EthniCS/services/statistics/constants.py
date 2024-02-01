@@ -1,0 +1,1 @@
+solvers_stats_filename = 'solvers_stats.csv'
