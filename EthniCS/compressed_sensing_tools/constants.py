@@ -1,0 +1,50 @@
+param_search_mapping = {
+    "GPSR-BB": {
+        "tau": (1e-6, 1e-1),
+        "alpha0": (0.1, 1.9),
+        "tolerance": (1e-6, 1e-1),
+        "iter_max": (100, 10000),
+    },
+    "LASSO": {"alpha": (1e-6, 1e-1), "positive": (0, 1), "max_iter": (1000, 10000)},
+    "CoSaMP": {"s": (5, 30), "epsilon": (1e-6, 1e-1), "max_iter": (1000, 10000)},
+    "OMP": {"n_nonzero_coefs": (1, 15)},
+    "OMP-PYLOPS": {
+        "niter_outer": (10, 1000),
+        "niter_inner": (10, 1000),
+        "sigma": (1e-10, 1e-1),
+    },
+    "CVXPY - solver=SCS": {},
+    "FISTA": {
+        "eps": (1e-10, 1e-1),
+        "tol": (1e-10, 1e-1),
+        "niter": (1000, 10000),
+        "threshkind": (0, 5),
+        "perc": (0, 100),
+    },
+    "ISTA": {
+        "eps": (1e-10, 1e-1),
+        "tol": (1e-10, 1e-1),
+        "niter": (1000, 10000),
+        "threshkind": (0, 5),
+        "perc": (0, 100),
+    },
+    "IRLS": {
+        "epsR": (1e-10, 1e-1),
+        "epsI": (1e-10, 1e-1),
+        "tolIRLS": (1e-10, 1e-1),
+        "nouter": (1000, 10000),
+    },
+    "SCS": {
+        "eps": (1e-6, 1e-1),
+        "alpha": (0.1, 1.9),
+        "scale": (2, 6),
+        "normalize": (0, 1),
+        "use_indirect": (0, 1),
+        "max_iters": (100, 10000),
+    },
+    "OSQP": {
+        "max_iter": (1000, 20000),
+        "eps_abs": (1e-6, 1e-3),
+        "eps_rel": (1e-6, 1e-3),
+    },
+}
