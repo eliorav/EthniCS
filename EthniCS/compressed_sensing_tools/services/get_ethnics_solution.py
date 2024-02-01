@@ -4,7 +4,7 @@ from .get_sparseness import get_sparseness
 from .fine_tune_result import fine_tuning_result
 
 
-def get_ensamble_solution(phi, y, solvers_data, threshold=0.9):
+def get_ethnics_solution(phi, y, solvers_data, threshold=0.9):
     """
     Returns the best solution from a list of solvers results for the CS problem
     """
