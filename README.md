@@ -13,7 +13,7 @@ This project provides tools for iAdmix calculation, data conversion, result calc
 
 ## Prerequisites
 Before using EthniCS, you need to prepare your data:
-1. **iAdmix allele frequencies table:** Create this table following the instructions in [population_genotype_frequency/README.md](./population_genotype_frequency/README.md).
+1. **iAdmix allele frequencies table:** Create this table following the instructions in [population_genotype_frequency/README.md](https://github.com/eliorav/Population-Genotype-Frequency/blob/master/README.md).
 2. **Data preparation pipeline:** Execute the data preparation steps as detailed in [data_preparation/README.md](./data_preparation/README.md).
 3. **Convert iAdmix Output:** Use the CLI to convert iAdmix output into a single CSV file. Instructions are provided below in the usage section.
 
