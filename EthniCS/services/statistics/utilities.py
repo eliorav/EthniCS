@@ -65,4 +65,4 @@ def get_solvers_stats_file_path(experiments_folder):
     Returns:
     str: The path to the solvers statistics file
     """
-    return get_stats_folder(experiments_folder) / solvers_stats_filename,
+    return get_stats_folder(experiments_folder) / solvers_stats_filename

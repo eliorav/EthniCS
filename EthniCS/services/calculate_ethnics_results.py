@@ -16,8 +16,9 @@ def calculate_ethnics_results(config:BaseConfig, ethnics_config:EthniCSConfig, o
     """
     ethnics_calculator = EthniCS(ethnics_config)
     similar_solvers = config.similar_solvers or []
+    files = list(output_folder.glob(f"**/{config.solvers_results_name}_*.pkl"))
 
-    for f in tqdm(output_folder.glob(f"**/{config.solvers_results_name}_*.pkl")):
+    for f in tqdm(files):
         m = int(f.name.split("_")[-1].split(".")[0])
 
         with open(f, "rb") as f_in:
