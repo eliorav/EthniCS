@@ -2,7 +2,14 @@
 # EthniCS - Large-Scale Ethnicity Screening Using Whole Genome Sequencing
 
 ## Overview
-EthniCS combines whole genome sequencing and non-adaptive group testing for large-scale ethnicity screens. This project provides tools for iAdmix calculation, data conversion, result calculation, experiment generation, and statistics analysis.
+Estimating an individual's ethnicity from genetic data is important for analyzing disease association studies, medical decision makings, forensic investigations, and genealogy.<br>
+This work combines non-adaptive group testing using the mathematical field of compressed sensing, and standard short-read sequencing to allow an up to 4-fold increase in the number of samples in large-scale ethnicity estimates. The method requires no prior knowledge regarding the tested individuals and provides almost identical results compared to testing each individual independently. Our results are based on simulated data and experimental data from the 1000 Genomes Project.<br> 
+We provide a computational approach that may reduce the costs of large-scale ancestry testing in many real-life scenarios while not compromising accuracy. We hope this method will allow more efficient large-scale ethnicity screens.<br>
+
+![Schematic Description of EthniCS](images/Schematic%20description%20of%20EthniCS.png)
+*__Schematic description of EthniCS.__ a. The ethnicity of n individuals for Mexican, Finnish, Chinese, and British ancestries is estimated by m pools, where m<<n. The DNA of each sample is allocated to several pools according to the pooling design, a.k.a., measurement matrix (the entry “1” corresponds to adding an individual’s DNA to the relevant pool). b. The m DNA samples undergo sample preparation and WGS. c. Results of each pool are submitted to an algorithm (e.g., iAdmix) that estimates the ethnicities in each pool. d. These are provided to EthniCS which reconstructs the ethnicity of each of the n individuals.*
+
+This project provides tools for iAdmix calculation, data conversion, result calculation, experiment generation, and statistics analysis.
 
 ## Prerequisites
 Before using EthniCS, you need to prepare your data:
