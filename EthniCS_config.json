@@ -1,0 +1,9 @@
+{
+    "perfect_psnr_threshold": 100,
+    "high_psnr_threshold": 50,
+    "medium_psnr_threshold": 45,
+    "low_psnr_threshold": 30,
+    "alpha": 5,
+    "sparseness_threshold": 0.9,
+    "fine_tune_max_iter": 5000
+}

@@ -1,6 +1,16 @@
 import numpy as np
 
 def generate_random_ethnicity_vector(p, n):
+    """
+    Generate a random ethnicity vector based on the given probability distribution.
+
+    Parameters:
+    p (list): The probability distribution of ethnicities.
+    n (int): The length of the vector.
+
+    Returns:
+    list: A random ethnicity vector.
+    """
     res = []
     
     for _ in range(n):
@@ -12,6 +22,13 @@ def generate_random_ethnicity_vector(p, n):
 
 def generate_ethnicity_matrix(ethnicity_distribution, n):
     """
-    Returns an ethnicity matrix from the give ethnicity distribution
+    Returns an ethnicity matrix from the given ethnicity distribution.
+
+    Parameters:
+    ethnicity_distribution (dict): The distribution of ethnicities.
+    n (int): The number of vectors in the matrix.
+
+    Returns:
+    numpy.ndarray: An ethnicity matrix.
     """
     return np.array([generate_random_ethnicity_vector(ethnicity_distribution[i], n) for i in ethnicity_distribution.keys()]).T

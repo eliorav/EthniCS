@@ -19,7 +19,7 @@ def load_ethnicity_distribution(ethnicity_distribution_path):
     with open(ethnicity_distribution_path, "rb") as f_in:
         return pickle.load(f_in)
 
-def generate_simulations(args, config, output_folder):
+def generate_simulations_by_distribution(args, config, output_folder):
     """
     Generate simulations for the experiments.
 

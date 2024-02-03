@@ -2,7 +2,7 @@ import argparse
 from pathlib import Path
 import shutil
 import pandas as pd
-from tqdm import tqdm
+from tqdm.auto import tqdm
 import argparse
 import json
 import os
