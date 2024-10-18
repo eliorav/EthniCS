@@ -32,7 +32,7 @@ class EthniCS:
         """
         best_solver, confidence = self.get_best_solver(phi, y, solvers_data, similar_solvers)
         x_res, a_hat, _ = solvers_data[best_solver['name']]
-        is_sparse = get_sparseness(a_hat) > int(phi.shape[1] * self.ethnics_config.sparseness_threshold)
+        is_sparse = get_sparseness(a_hat) >= int(phi.shape[1] * self.ethnics_config.sparseness_threshold)
 
         return (
             fine_tuning_result(phi, x_res, y, max_iter=self.ethnics_config.fine_tune_max_iter)
@@ -50,30 +50,30 @@ class EthniCS:
         - y: The observed signal.
         - solvers_data: A dictionary containing the results of different solvers.
         - similar_solvers: A list of tuples representing similar solvers.
+        
 
         Returns:
         - The best solver.
         - The confidence of the best solver.
         """
-        similar_solvers = self.get_similar_solutions(solvers_data, similar_solvers)
+        similar_solutions = self.get_similar_solutions(solvers_data, similar_solvers)
         solvers_stats = self.get_solvers_stats(y, solvers_data)
 
-        solvers_with_support = similar_solvers.first_sol.unique().tolist() 
+        solvers_with_support = similar_solutions.first_sol.unique().tolist() 
         selected_solvers = solvers_stats.set_index('name')
-
-        confidence = 1
 
         if len(solvers_with_support) > 0:
             strong_solvers = selected_solvers[selected_solvers.psnr > self.ethnics_config.high_psnr_threshold].reset_index().name.to_list()
             selected_solvers = selected_solvers.loc[solvers_with_support+strong_solvers].sort_values('score', ascending=False)
-        else:
-            confidence *= 0.8
 
         if selected_solvers[selected_solvers.psnr > self.ethnics_config.medium_psnr_threshold].shape[0] > 0:
             selected_solvers = selected_solvers[selected_solvers.psnr > self.ethnics_config.medium_psnr_threshold].sort_values('score', ascending=False)
 
         best_solver = selected_solvers.reset_index().iloc[0].to_dict()
-        confidence *= self.get_confidence_by_stats(phi, best_solver['psnr'], best_solver['sparseness'])
+
+        supporting_solvers_ratio = len(similar_solutions[similar_solutions.first_sol == best_solver['name']])/(len(solvers_data.keys())-1)
+        
+        confidence = self.get_confidence_by_stats(phi, best_solver['psnr'], best_solver['sparseness'], supporting_solvers_ratio)
 
         return best_solver, confidence
     
@@ -140,7 +140,7 @@ class EthniCS:
         return df[df.psnr > self.ethnics_config.low_psnr_threshold].sort_values('psnr', ascending=False)
 
 
-    def get_confidence_by_stats(self, phi, psnr, sparseness):
+    def get_confidence_by_stats(self, phi, psnr_score, sparseness, supporting_solvers_ratio):
         """
         Returns the confidence based on the given statistics.
 
@@ -148,27 +148,21 @@ class EthniCS:
         - phi: The measurement matrix.
         - psnr: The PSNR score.
         - sparseness: The sparseness of the signal.
-
         Returns:
         - The confidence.
         """
-        confidence = 1
+        confidence = 0
         sparseness_ratio = sparseness/phi.shape[1]
 
-        if psnr > self.ethnics_config.perfect_psnr_threshold and sparseness_ratio > self.ethnics_config.sparseness_threshold:
-            return 1
-
-        if  self.ethnics_config.high_psnr_threshold <= psnr < self.ethnics_config.perfect_psnr_threshold:
-            if sparseness_ratio < self.ethnics_config.sparseness_threshold:
-                confidence *= 0.9 * min(psnr/self.ethnics_config.perfect_psnr_threshold, 0.7)
-        elif self.ethnics_config.low_psnr_threshold <= psnr < self.ethnics_config.high_psnr_threshold:
-            confidence *= 0.6 * min(psnr/self.ethnics_config.high_psnr_threshold, 0.5)
+        if psnr_score >= self.ethnics_config.high_psnr_threshold:
+            if sparseness_ratio >= self.ethnics_config.sparseness_threshold:
+                confidence = 0.9+0.1*supporting_solvers_ratio
+            else:
+                confidence = sparseness_ratio
+        elif psnr_score >= self.ethnics_config.low_psnr_threshold:
+            # assuming sparseness_ratio < 0.9 for this case
+            confidence =  (0.6+(0.4*(psnr_score-self.ethnics_config.low_psnr_threshold))/(self.ethnics_config.high_psnr_threshold - self.ethnics_config.low_psnr_threshold))*sparseness_ratio
         else:
-            confidence *= 0.4 * min(psnr/self.ethnics_config.low_psnr_threshold, 0.5)
-
-        if 0.5 < sparseness_ratio <= self.ethnics_config.sparseness_threshold:
-            confidence *= 0.7
-        elif sparseness_ratio <= 0.5:
-            confidence *= 0.5
+            confidence = 0.6*(psnr_score/self.ethnics_config.low_psnr_threshold)*sparseness_ratio
 
         return confidence

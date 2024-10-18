@@ -121,7 +121,7 @@ def generate_super_population_experiments(ethnicity_file_path:Path='./data/1000g
     if not no_stats:
         calculate_solvers_stats(output_folder, config)
 
-def calculate_experiment_statistics(experiments_folder, config_type:ConfigType):
+def calculate_experiment_statistics(experiments_folder, config_type:ConfigType=ConfigType.REAL_DATA):
     """
     Calculate statistics for the solvers using different experiment configurations.
 

@@ -1,4 +1,6 @@
 from enum import Enum
+
+from .base_config import BaseConfig
 from .generate_real_data_experiments_config import RealDataConfig
 from .generate_simulation_config import SimulationDataConfig
 from .generate_super_population_experiments_config import SuperPopulationConfig
@@ -17,7 +19,7 @@ config_by_type = {
     ConfigType.SUPER_POPULATION: SuperPopulationConfig,
 }
 
-def get_config_by_type(config_type: ConfigType):
+def get_config_by_type(config_type: ConfigType) -> BaseConfig:
     config_class = config_by_type.get(config_type)
 
     if config_class is None:

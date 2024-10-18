@@ -6,7 +6,6 @@ class EthniCSConfig(BaseModel):
     A class representing the configuration for EthniCS.
 
     Attributes:
-        perfect_psnr_threshold (int): The perfect PSNR threshold.
         high_psnr_threshold (int): The high PSNR threshold.
         medium_psnr_threshold (int): The medium PSNR threshold.
         low_psnr_threshold (int): The low PSNR threshold.
@@ -15,7 +14,6 @@ class EthniCSConfig(BaseModel):
         fine_tune_max_iter (int): The maximum number of iterations for the fine tuning.
     """
 
-    perfect_psnr_threshold:int
     high_psnr_threshold:int
     medium_psnr_threshold:int
     low_psnr_threshold:int

@@ -32,25 +32,36 @@ def get_color_range(metric_name):
         return [0, 1]
 
 
-def render_solver_by_pools(fig, row, col, df, metric, non_zero=None, ethnicity_num = None, showlegend=True, log_y=True):    
-    assert non_zero is not None or ethnicity_num is not None, "you must use non_zero or ethnicity_num args"
-    temp_df = df[(df.name.isin(list(supported_solvers.keys()))) & ((df.name == 'all zeros') | (df.non_zero == non_zero if non_zero is not None else df.ethnicity_num == ethnicity_num))].groupby(['name', 'num_of_pools']).mean().reset_index()
-    fig1 = px.line(temp_df, x='num_of_pools', y=metric, color='name', markers=True, color_discrete_map=solver_to_color, log_y=log_y)
+def render_solver_by_pools(fig, row, col, df, metric, sparsity_ratio=None, ethnicity_num=None, showlegend=True, log_y=True):    
+  assert sparsity_ratio is not None or ethnicity_num is not None, "you must use sparsity_ratio or ethnicity_num args"
+  temp_df = df[(df.name.isin(list(supported_solvers.keys()))) & ((df.name == 'all zeros') | (df.original_sparsity_ratio == sparsity_ratio if sparsity_ratio is not None else df.ethnicity_num == ethnicity_num))].groupby(['name', 'num_of_pools']).mean().reset_index()
+  fig1 = px.line(temp_df, x='num_of_pools', y=metric, color='name', markers=True, color_discrete_map=solver_to_color, log_y=log_y)
 
-    fig1.update_layout(xaxis=dict(showgrid=False),
-              yaxis=dict(showgrid=False)
-    )
-    traces = sorted(list(fig1.select_traces()), key=lambda x: supported_solvers.get(x.name, 1))
+  fig1.update_layout(xaxis=dict(showgrid=False),
+            yaxis=dict(showgrid=False)
+  )
+  traces = sorted(list(fig1.select_traces()), key=lambda x: supported_solvers.get(x.name, 1))
 
-    for trace in traces:
-        trace.showlegend = showlegend
-        fig.add_trace(trace, row=row, col=col)
+  for trace in traces:
+      trace.showlegend = showlegend
+      if trace.name == ETHNICS_SOLVER:
+          # Replace ETHNICS_SOLVER line with empty square markers
+          fig.add_trace(go.Scatter(
+              x=trace.x,
+              y=trace.y,
+              mode='markers',
+              marker=dict(symbol='square-open', size=12, color=solver_to_color[ETHNICS_SOLVER], line=dict(width=4, color=solver_to_color[ETHNICS_SOLVER])),
+              name=f'<b>{ETHNICS_SOLVER}</b>',
+              showlegend=showlegend
+          ), row=row, col=col)
+      else:
+          fig.add_trace(trace, row=row, col=col)
 
-    fig.update_traces(line=dict(width=6), marker=dict(size=12))
-    fig.update_layout(legend_font_size=20, legend_tracegroupgap=1)
-    fig.for_each_trace(lambda t: t.update(name=f'<b>{t.name}</b>'))
+  fig.update_traces(line=dict(width=6), marker=dict(size=12))
+  fig.update_layout(legend_font_size=20, legend_tracegroupgap=1)
+  fig.for_each_trace(lambda t: t.update(name=f'<b>{t.name}</b>'))
 
-    return fig
+  return fig
 
 def render_solver_by_sparsenees(fig, row, col, metric, num_of_pools, df, n=1024):
     temp_df = df.copy()
@@ -105,7 +116,7 @@ def render_confidence_heatmap(fig, row, col, coloraxis, df, solver = ETHNICS_SOL
     temp_df['k'] = ((n-temp_df.x_sparseness)/n)*100
     temp_df['m/n'] = temp_df.num_of_pools/n
     temp_df = temp_df.groupby(['k', 'm/n']).mean().reset_index()
-    temp_df = temp_df[['k', 'm/n', 'probability']]
+    temp_df = temp_df[['k', 'm/n', 'confidence']]
 
     temp_df2 = pd.DataFrame(
         columns=temp_df['m/n'].unique(), index=temp_df.k.unique()
@@ -113,7 +124,7 @@ def render_confidence_heatmap(fig, row, col, coloraxis, df, solver = ETHNICS_SOL
 
 
     for item in temp_df.to_dict('records'):
-        temp_df2.loc[item['k']][item['m/n']] = item.get('probability', 1)
+        temp_df2.loc[item['k']][item['m/n']] = item.get('confidence', 1)
     temp_df2 = temp_df2.sort_index(ascending=True)
     zmin, zmax = [0, 1]
     temp_df2 = temp_df2.fillna(zmax)
@@ -195,15 +206,34 @@ def render_subplot_layout(metric, subplot_titles, log_y1=True, log_y2=True, titl
     fig.for_each_annotation(lambda a: a.update(text=f'<b>{a.text}</b>'))
     fig.update_annotations(font=dict(family="Helvetica", size=24))
 
+    # Add subplot letters
+    letters = ['a.', 'b.', 'c.', 'd.', 'e.']
+    x_positions = [-0.02, 0.55, -0.02, 0.35, 0.72]
+    y_positions = [1.05, 1.05, 0.48, 0.48, 0.48]
+    
+    for letter, x, y in zip(letters, x_positions, y_positions):
+        fig.add_annotation(
+            xref='paper',
+            yref='paper',
+            x=x,
+            y=y,
+            text=f"<b>{letter}</b>",
+            showarrow=False,
+            font=dict(size=28, color="black"),
+            align="right",
+            xanchor="left",
+            yanchor="bottom",
+        )
+
 
     return fig
 
-def render_by_sparse_level(df, metric, non_zero1, non_zero2, num_of_pools, log_y1=True, log_y2=True, title_text='', n=1024):
-    non_zero1_prec = int(non_zero1 * 100)
-    non_zero2_prec = int(non_zero2 * 100)
+def render_by_sparse_level(df, metric, sparsity_ratio1, sparsity_ratio2, num_of_pools, log_y1=True, log_y2=True, title_text='', n=1024):
+    sparsity_prec1 = int(sparsity_ratio1 * 100)
+    sparsity_prec2 = int(sparsity_ratio2 * 100)
     subplot_titles=(
-        f"~{non_zero1_prec}% non-zero elements", 
-        f"~{non_zero2_prec}% non-zero elements",
+        f"~{sparsity_prec1}% non-zero elements", 
+        f"~{sparsity_prec2}% non-zero elements",
         "", 
         "" , 
         f"{num_of_pools} pools", 
@@ -215,13 +245,13 @@ def render_by_sparse_level(df, metric, non_zero1, non_zero2, num_of_pools, log_y
 
     fig = render_subplot_layout(metric, subplot_titles, log_y1, log_y2, title_text)
 
-    render_solver_by_pools(fig, row=1, col=1, df=df, metric=metric, non_zero=non_zero1, log_y=True)
-    render_solver_by_pools(fig, row=1, col=4, df=df, metric=metric, non_zero=non_zero2, log_y=True, showlegend=False)
+    render_solver_by_pools(fig, row=1, col=1, df=df, metric=metric, sparsity_ratio=sparsity_ratio1, log_y=True)
+    render_solver_by_pools(fig, row=1, col=4, df=df, metric=metric, sparsity_ratio=sparsity_ratio2, log_y=True, showlegend=False)
     render_solver_by_sparsenees(fig, row=6, col=1, metric=metric, num_of_pools=num_of_pools, df=df, n=n)
     render_heatmap(fig, row=6, col=3, coloraxis='coloraxis', df=df, metric=metric, n=n)
     render_confidence_heatmap(fig, row=6, col=5, coloraxis='coloraxis2', df=df, n=n)
 
-    fig.show()
+    return fig
 
 def render_by_ethnicity_num(df, metric, ethnicity_names, ethnicities_to_full_name_mapping, ethnicity_num1, ethnicity_num2, num_of_pools, log_y1=True, log_y2=True, title_text='', n=1024):
     subplot_titles=(
@@ -270,9 +300,9 @@ def render_simulated_data_chart(df, metric, title_text='', n=1024):
 
     fig.show()
 
-def render_error_bar_by_non_zero(fig, row, col, df, num_of_pools, showlegend=True):
+def render_error_bar_by_sparsity_ratio(fig, row, col, df, num_of_pools, showlegend=True):
     temp_df = df[(df.name == ETHNICS_SOLVER) & (df.num_of_pools == num_of_pools)]
-    fig1 = px.box(temp_df, x='non_zero', y='psnr', color='non_zero')
+    fig1 = px.box(temp_df, x='original_sparsity_ratio', y='psnr', color='original_sparsity_ratio')
 
     for trace in fig1.select_traces():
         trace.showlegend = showlegend
@@ -291,7 +321,7 @@ def render_grid_error_bar_by_non_zero(df, title_text=''):
         row = (idx // 2) +1
         col = (idx % 2) + 1
 
-        render_error_bar_by_non_zero(fig, row, col, df, m, showlegend=idx==0)
+        render_error_bar_by_sparsity_ratio(fig, row, col, df, m, showlegend=idx==0)
 
         axis_num = '' if idx == 0 else idx + 1
         fig['layout'][f'xaxis{axis_num}']['title'] = 'sparsity'
@@ -301,7 +331,7 @@ def render_grid_error_bar_by_non_zero(df, title_text=''):
     fig.show()
 
 def render_error_bar_by_num_of_pools(fig, row, col, df, k, showlegend=True):
-    temp_df = df[(df.name == ETHNICS_SOLVER) & (df.non_zero == k)]
+    temp_df = df[(df.name == ETHNICS_SOLVER) & (df.original_sparsity_ratio == k)]
     fig1 = px.box(temp_df, x='num_of_pools', y='psnr', color='num_of_pools')
 
     for trace in fig1.select_traces():
