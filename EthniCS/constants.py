@@ -1,5 +1,11 @@
 ETHNICS_SOLVER = 'EthniCS'
 
+ethnicity_names = [
+  "ACB", "ASW", "BEB", "CDX", "CEU", "CHB", "CHS", "CLM", "ESN", "FIN",
+  "GBR", "GIH", "GWD", "IBS", "ITU", "JPT", "KHV", "LWK", "MSL", "MXL",
+  "PEL", "PJL", "PUR", "STU", "TSI", "YRI"
+]
+
 ethnicities_to_full_name_mapping = {
     "ACB": "African Caribbean in Barbados",
     "ASW": "African Ancestry in SW USA",
@@ -25,5 +31,6 @@ ethnicities_to_full_name_mapping = {
     "PJL": "Punjabi in Lahore, Pakistan",
     "STU": "Sri Lankan Tamil in the UK",
     "TSI": "Toscani in Italia",
-    "YRI": "Yoruba in Ibadan, Nigeria"
+    "YRI": "Yoruba in Ibadan, Nigeria",
+    "CEU": "Northern Europeans from Utah"
 }
