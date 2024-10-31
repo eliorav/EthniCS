@@ -81,7 +81,7 @@ def render_solver_by_sparsenees(fig, row, col, metric, num_of_pools, df, n=1024)
     return fig
 
 
-def render_heatmap(fig, row, col, coloraxis, df, metric, solver=ETHNICS_SOLVER, n=1024):
+def render_heatmap(fig, row, col, coloraxis, df, metric, solver=ETHNICS_SOLVER, n=1024, custom_yticks=None):
     temp_df = df[df.name == solver].copy().drop(columns=["name"])
     temp_df["k"] = ((n - temp_df.x_sparseness) / n) * 100
     temp_df["m/n"] = temp_df.num_of_pools / n
@@ -97,11 +97,19 @@ def render_heatmap(fig, row, col, coloraxis, df, metric, solver=ETHNICS_SOLVER, 
     temp_df2 = temp_df2.sort_index(ascending=True)
     temp_df2 = temp_df2.fillna(zmin)
 
-    fig.add_trace(go.Heatmap(z=temp_df2.values, x=temp_df2.columns.values, y=temp_df2.index.values, hovertemplate="δ: %{x}<br>k: %{y}<br>" + solver.upper() + ": %{z}<extra></extra>", zmin=zmin, zmax=zmax, coloraxis=coloraxis), row=row, col=col)
+    # Create the heatmap trace
+    heatmap_trace = go.Heatmap(z=temp_df2.values, x=temp_df2.columns.values, y=temp_df2.index.values, hovertemplate="δ: %{x}<br>k: %{y}<br>" + solver.upper() + ": %{z}<extra></extra>", zmin=zmin, zmax=zmax, coloraxis=coloraxis)
+
+    fig.add_trace(heatmap_trace, row=row, col=col)
+
+    # Update yaxis to show only specific ticks
+    if custom_yticks is not None:
+        fig.update_yaxes(tickmode="array", tickvals=custom_yticks, ticktext=[f"<b>{y}</b>" for y in custom_yticks], row=row, col=col)
+
     return fig
 
 
-def render_confidence_heatmap(fig, row, col, coloraxis, df, solver=ETHNICS_SOLVER, n=1024):
+def render_confidence_heatmap(fig, row, col, coloraxis, df, solver=ETHNICS_SOLVER, n=1024, custom_yticks=None):
     temp_df = df[df.name == solver].copy().drop(columns=["name"])
     temp_df["k"] = ((n - temp_df.x_sparseness) / n) * 100
     temp_df["m/n"] = temp_df.num_of_pools / n
@@ -112,10 +120,19 @@ def render_confidence_heatmap(fig, row, col, coloraxis, df, solver=ETHNICS_SOLVE
 
     for item in temp_df.to_dict("records"):
         temp_df2.loc[item["k"]][item["m/n"]] = item.get("confidence", 1)
+
     temp_df2 = temp_df2.sort_index(ascending=True)
     zmin, zmax = [0, 1]
     temp_df2 = temp_df2.fillna(zmax)
-    fig.add_trace(go.Heatmap(z=temp_df2.values, x=temp_df2.columns.values, y=temp_df2.index.values, hovertemplate="δ: %{x}<br>k: %{y}<br>" + solver.upper() + ": %{z}<extra></extra>", zmin=zmin, zmax=zmax, coloraxis=coloraxis), row=row, col=col)
+
+    # Create the heatmap trace
+    heatmap_trace = go.Heatmap(z=temp_df2.values, x=temp_df2.columns.values, y=temp_df2.index.values, hovertemplate="δ: %{x}<br>k: %{y}<br>" + solver.upper() + ": %{z}<extra></extra>", zmin=zmin, zmax=zmax, coloraxis=coloraxis)
+
+    fig.add_trace(heatmap_trace, row=row, col=col)
+
+    # Update yaxis to show only specific ticks
+    if custom_yticks is not None:
+        fig.update_yaxes(tickmode="array", tickvals=custom_yticks, ticktext=[f"<b>{y}</b>" for y in custom_yticks], row=row, col=col)
 
     return fig
 
@@ -214,7 +231,7 @@ def render_by_sparse_level(df, metric, sparsity_ratio1, sparsity_ratio2, num_of_
     return fig
 
 
-def render_by_ethnicity_num(df, metric, ethnicity_names, ethnicities_to_full_name_mapping, ethnicity_num1, ethnicity_num2, num_of_pools, log_y1=True, log_y2=True, title_text="", n=1024):
+def render_by_ethnicity_num(df, metric, ethnicity_names, ethnicities_to_full_name_mapping, ethnicity_num1, ethnicity_num2, num_of_pools, log_y1=True, log_y2=True, title_text="", n=1024, custom_yticks=None):
     subplot_titles = (f"Ethnicity {ethnicities_to_full_name_mapping[ethnicity_names[ethnicity_num1]]}", f"Ethnicity {ethnicities_to_full_name_mapping[ethnicity_names[ethnicity_num2]]}", "", "", f"{num_of_pools} pools", "MSE", "Confidence score", "", "", "")
 
     fig = render_subplot_layout(metric, subplot_titles, log_y1, log_y2, title_text)
@@ -226,8 +243,8 @@ def render_by_ethnicity_num(df, metric, ethnicity_names, ethnicities_to_full_nam
     fig.layout.annotations[1].text = f"<b>{ethnicities_to_full_name_mapping[ethnicity_names[ethnicity_num2]]}</b><br>{sparsity2}"
 
     render_solver_by_sparsenees(fig, row=6, col=1, metric=metric, num_of_pools=num_of_pools, df=df, n=n)
-    render_heatmap(fig, row=6, col=3, coloraxis="coloraxis", df=df, metric=metric, n=n)
-    render_confidence_heatmap(fig, row=6, col=5, coloraxis="coloraxis2", df=df, n=n)
+    render_heatmap(fig, row=6, col=3, coloraxis="coloraxis", df=df, metric=metric, n=n, custom_yticks=custom_yticks)
+    render_confidence_heatmap(fig, row=6, col=5, coloraxis="coloraxis2", df=df, n=n, custom_yticks=custom_yticks)
 
     return fig
 
