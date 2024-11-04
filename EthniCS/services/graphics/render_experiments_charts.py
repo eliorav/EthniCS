@@ -39,7 +39,7 @@ def render_solver_by_pools(fig, row, col, df, metric, sparsity_ratio=None, ethni
     sparsity_text = ""
     if ethnicity_num is not None:
         avg_sparsity = df[df.ethnicity_num == ethnicity_num]["original_sparsity_ratio"].mean()
-        sparsity_text = f"sparsity {round(avg_sparsity * 100, 1)}%"
+        sparsity_text = f"{round(avg_sparsity * 100, 1)}% non-zero individuals"
 
     temp_df = df[(df.name.isin(list(supported_solvers.keys()))) & ((df.name == "all zeros") | (df.original_sparsity_ratio == sparsity_ratio if sparsity_ratio is not None else df.ethnicity_num == ethnicity_num))].groupby(["name", "num_of_pools"]).mean().reset_index()
     fig1 = px.line(temp_df, x="num_of_pools", y=metric, color="name", markers=True, color_discrete_map=solver_to_color, log_y=log_y)
@@ -173,14 +173,14 @@ def render_subplot_layout(metric, subplot_titles, log_y1=True, log_y2=True, titl
     fig["layout"]["yaxis2"]["title"] = f"<b>{metric.upper()}</b>"
     fig["layout"]["yaxis2"]["type"] = "log" if log_y2 else fig["layout"]["yaxis2"]["type"]
 
-    fig["layout"]["xaxis5"]["title"] = "<b>% sparsity</b>"
+    fig["layout"]["xaxis5"]["title"] = "<b>% non-zero individuals</b>"
     fig["layout"]["yaxis5"]["title"] = f"<b>{metric.upper()}</b>"
 
     fig["layout"]["xaxis6"]["title"] = "<b># pools/1024</b>"
-    fig["layout"]["yaxis6"]["title"] = "<b>% sparsity</b>"
+    fig["layout"]["yaxis6"]["title"] = "<b>% non-zero individuals</b>"
 
     fig["layout"]["xaxis7"]["title"] = "<b># pools/1024</b>"
-    fig["layout"]["yaxis7"]["title"] = "<b>% sparsity</b>"
+    fig["layout"]["yaxis7"]["title"] = "<b>% non-zero individuals</b>"
 
     fig.update_xaxes(showline=True, linewidth=4, linecolor="black", tickfont=dict(size=22), tickprefix="<b>", ticksuffix="</b>", title_standoff=0)
     fig.update_yaxes(showline=True, linewidth=4, linecolor="black", tickfont=dict(size=22), tickprefix="<b>", ticksuffix="</b>", title_standoff=0)
@@ -218,7 +218,7 @@ def render_subplot_layout(metric, subplot_titles, log_y1=True, log_y2=True, titl
 def render_by_sparse_level(df, metric, sparsity_ratio1, sparsity_ratio2, num_of_pools, log_y1=True, log_y2=True, title_text="", n=1024):
     sparsity_prec1 = int(sparsity_ratio1 * 100)
     sparsity_prec2 = int(sparsity_ratio2 * 100)
-    subplot_titles = (f"~{sparsity_prec1}% non-zero elements", f"~{sparsity_prec2}% non-zero elements", "", "", f"{num_of_pools} pools", "MSE", "confidence score", "", "", "")
+    subplot_titles = (f"~{sparsity_prec1}% non-zero individuals", f"~{sparsity_prec2}% non-zero individuals", "", "", f"{num_of_pools} pools", "MSE", "confidence score", "", "", "")
 
     fig = render_subplot_layout(metric, subplot_titles, log_y1, log_y2, title_text)
 
